@@ -58,16 +58,12 @@ void desc_add_ptr(uint32_t *desc, phys_addr_t *ptr)
 {
 	uint32_t len = desc_length(desc);
 
-	/* Add Word at Last */
-	phys_addr_t *last = (phys_addr_t *) (desc + len);
-
-#ifdef CONFIG_PHYS_64BIT
-	ptr_addr_t *ptr_addr = (ptr_addr_t *) last;
-
-	ptr_addr->m_halves.high = PHYS_ADDR_HI(ptr);
-	ptr_addr->m_halves.low = PHYS_ADDR_LO(ptr);
+#ifdef NXP_SEC_BE
+	desc[len + 0] = PHYS_ADDR_HI(ptr);
+	desc[len + 1] = PHYS_ADDR_LO(ptr);
 #else
-	*last = ptr;
+	desc[len + 0] = PHYS_ADDR_LO(ptr);
+	desc[len + 1] = PHYS_ADDR_HI(ptr);
 #endif
 
 	/* Increase the length */
